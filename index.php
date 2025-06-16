@@ -1,0 +1,362 @@
+<?php
+$pageTitle = "Aventura Global - Tu Próximo Destino";
+$activePage = "inicio"; 
+
+require_once 'header.php';
+
+
+?>
+<style>
+
+:root {
+    --primary-color: #0077b6;
+    --secondary-color: #00b4d8;
+    --accent-color: #ffc300;
+    --dark-color: #212529;
+    --light-color: #f8f9fa;
+    --font-family: 'Poppins', sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-family);
+    color: var(--dark-color);
+    background-color: #fdfdfd;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+ul {
+    list-style: none;
+}
+
+h1, h2, h3 {
+    font-weight: 600;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 50px;
+    color: var(--dark-color);
+}
+
+
+.main-header {
+    background-color: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid #eee;
+    padding: 1rem 5%;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.navbar-nav {
+    display: flex;
+    gap: 2rem;
+}
+
+.nav-link {
+    font-size: 1rem;
+    font-weight: 400;
+    transition: color 0.3s ease;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.cart-icon {
+    position: relative;
+    font-size: 1.2rem;
+}
+
+.cart-count {
+    position: absolute;
+    top: -8px;
+    right: -10px;
+    background-color: var(--accent-color);
+    color: var(--dark-color);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 2px solid #fff;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #005a8d;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #009ac1;
+}
+
+
+.hero-section {
+    height: 85vh;
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?q=80&w=2070&auto=format&fit=crop);
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: white;
+    padding: 0 5%;
+}
+
+.hero-content h1 {
+    font-size: 3.5rem;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+}
+
+.hero-content p {
+    font-size: 1.2rem;
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+    max-width: 600px;
+}
+
+.search-form {
+    display: flex;
+    background: white;
+    border-radius: 50px;
+    padding: 8px;
+    width: 100%;
+    max-width: 600px;
+}
+
+.search-input {
+    flex-grow: 1;
+    border: none;
+    outline: none;
+    font-size: 1rem;
+    padding: 0 1rem;
+    background: transparent;
+}
+
+.featured-destinations {
+    padding: 80px 5%;
+}
+
+.packages-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 30px;
+}
+
+.package-card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.package-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+}
+
+.package-image {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+}
+
+.package-info {
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.package-title {
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+}
+
+.package-description {
+    font-size: 0.95rem;
+    color: #555;
+    flex-grow: 1;
+    margin-bottom: 20px;
+}
+
+.package-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #777;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+}
+
+.package-details span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.package-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+}
+
+.package-price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+/* --- FOOTER --- */
+.main-footer {
+    background-color: var(--dark-color);
+    color: var(--light-color);
+    padding: 50px 5% 20px;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.footer-section h4 {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    color: white;
+}
+
+.footer-section p, .footer-section ul li {
+    color: #ccc;
+    margin-bottom: 10px;
+}
+
+.footer-section a:hover {
+    color: var(--secondary-color);
+}
+
+.social-icons a {
+    font-size: 1.5rem;
+    margin-right: 15px;
+    transition: color 0.3s ease;
+}
+
+.footer-bottom {
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid #444;
+    font-size: 0.9rem;
+    color: #aaa;
+}
+</style>
+
+
+<section class="hero-section">
+    <div class="hero-content">
+        <h1>Encuentra tu Próxima Aventura</h1>
+        <p>Explora los destinos más increíbles del mundo. Preparamos el viaje de tus sueños.</p>
+        <form class="search-form">
+            <input type="text" placeholder="¿A dónde quieres ir? (Ej: París, Caribe...)" class="search-input">
+            <button type="submit" class="btn btn-primary">Buscar</button>
+            
+        </form>
+    </div>
+</section>
+
+<section class="featured-destinations">
+    <h2 class="section-title">Destinos Populares</h2>
+    <div class="packages-grid">
+
+        <?php foreach ($paquetes as $paquete): ?>
+            <article class="package-card">
+                <img src="<?php echo htmlspecialchars($paquete['imagen']); ?>" alt="<?php echo htmlspecialchars($paquete['nombre']); ?>" class="package-image">
+                <div class="package-info">
+                    <h3 class="package-title"><?php echo htmlspecialchars($paquete['nombre']); ?></h3>
+                    <p class="package-description"><?php echo htmlspecialchars($paquete['descripcion']); ?></p>
+                    <div class="package-details">
+                        <span class="package-duration"><i class="fas fa-clock"></i> <?php echo htmlspecialchars($paquete['duracion']); ?></span>
+                        <span class="package-rating"><i class="fas fa-star"></i> <?php echo htmlspecialchars($paquete['rating']); ?></span>
+                    </div>
+                    <div class="package-footer">
+                        <p class="package-price">$<?php echo number_format($paquete['precio'], 0, ',', '.'); ?> USD</p>
+                        <button class="btn btn-secondary add-to-cart-btn" 
+                                data-id="<?php echo $paquete['id']; ?>" 
+                                data-name="<?php echo htmlspecialchars($paquete['nombre']); ?>" 
+                                data-price="<?php echo $paquete['precio']; ?>">
+                            Añadir al Carrito
+                        </button>
+                    </div>
+                </div>
+            </article>
+        <?php endforeach; ?>
+
+    </div>
+</section>
+
+<?php
+
+require_once 'footer.php';
+?>
