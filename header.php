@@ -25,7 +25,7 @@
                 <li><a href="#" class="nav-link <?php echo ($activePage === 'contacto') ? 'active' : ''; ?>">Contacto</a></li>
             </ul>
             <div class="navbar-right">
-                <a href="#" class="nav-link">Mi Cuenta</a>
+                <a href="usuario.php" class="nav-link">Mi Cuenta</a>
                 <a href="carrito.php" class="nav-link cart-icon">
                     <i class="fas fa-shopping-cart"></i>
                     <span id="cart-count" class="cart-count">0</span>
