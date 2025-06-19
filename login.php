@@ -1,8 +1,9 @@
 <?php
 session_start();
 
-// Si ya está logueado, redirigir al perfil
-if (isset($_SESSION['usuario_id'])) {
+// Si ya hay una sesión iniciada (verificando la variable 'id' que sí se establece)
+if (isset($_SESSION['id'])) { 
+    // Redirigir a la página de perfil del usuario (usuario.php)
     header("Location: usuario.php");
     exit();
 }
@@ -12,6 +13,7 @@ require_once 'header.php';
 ?>
 <link rel="stylesheet" type="text/css" href="indstyle.css">
 <style>
+/* Estilos para el contenedor de login */
 .login-container {
     max-width: 400px;
     margin: 100px auto;
@@ -71,14 +73,13 @@ require_once 'header.php';
         <div class="error-msg">Usuario o contraseña incorrectos.</div>
     <?php endif; ?>
 
-    <form action="procesar_login.php" method="POST">
+    <form action="login_validar.php" method="POST">
         <input type="text" name="username" placeholder="Nombre de usuario" required>
-        <input type="password" name="password" placeholder="Contraseña" required>
-        <button type="submit">Ingresar</button>
+        <input type="password" name="contraseña" placeholder="Contraseña" required> <button type="submit">Ingresar</button>
     </form>
     <p style="text-align: center; margin-top: 15px;">
-    ¿No tienes una cuenta? <a href="registro.php">Regístrate aquí</a>
-</p>
+        ¿No tienes una cuenta? <a href="registro.php">Regístrate aquí</a>
+    </p>
 </div>
 
 <?php require_once 'footer.php'; ?>
