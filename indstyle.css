@@ -32,6 +32,7 @@ h1, h2, h3 {
     font-weight: 600;
 }
 
+
 .section-title {
     text-align: center;
     font-size: 2.5rem;
@@ -153,13 +154,17 @@ h1, h2, h3 {
 .hero-content h1 {
     font-size: 3.5rem;
     text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+
 }
 
 .hero-content p {
     font-size: 1.2rem;
     margin-top: 1rem;
     margin-bottom: 2rem;
-    max-width: 600px;
+    max-width: 600px; /* Aquí ya tienes un "ancho" máximo */
+    margin-left: auto; /* Asegura el centrado horizontal */
+    margin-right: auto; /* Asegura el centrado horizontal */
+    text-align: center; /* Centra el texto dentro del párrafo */
 }
 
 .search-form {

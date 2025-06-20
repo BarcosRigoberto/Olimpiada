@@ -1,120 +1,107 @@
 <?php
 session_start();
-$pageTitle = "Mi Perfil - Aventura Global";
-$activePage = "perfil"; // Puedes usar esto en tu navbar para marcarlo como activo
 
-// Verificar si el usuario está logueado
-if (!isset($_SESSION['usuario_id'])) {
+// Si el usuario NO ha iniciado sesión, redirigirlo al login
+if (!isset($_SESSION['id'])) {
     header("Location: login.php");
     exit();
 }
 
-// Conexión a la base de datos
-$host = 'localhost';
-$usuario = 'root';
-$contrasena = ''; // Cambia si tienes contraseña
-$basedatos = 'pagviajes';
+$pageTitle = "Mi Perfil - " . htmlspecialchars($_SESSION['username']); // Título dinámico
+require_once 'header.php'; // Incluye el header para la navegación
 
-$conn = new mysqli($host, $usuario, $contrasena, $basedatos);
+// Puedes obtener los datos del usuario de la sesión
+$usuario_id = $_SESSION['id'];
+$username = $_SESSION['username'];
+$nombre_completo = $_SESSION['nombre']; // Asumiendo que 'nombre' es el nombre completo o solo el nombre
+$foto_perfil = $_SESSION['foto_perfil'] ?? 'assets/img/default_avatar.png'; // Usar la de la sesión o la por defecto
 
+// Opcional: Si necesitas más datos del usuario que no están en la sesión,
+// puedes hacer una consulta a la base de datos aquí usando $usuario_id.
+/*
+$conn = new mysqli("localhost", "root", "", "pagviajes");
 if ($conn->connect_error) {
-    die("Error de conexión: " . $conn->connect_error);
+    die("Conexión fallida: " . $conn->connect_error);
 }
-
-// Obtener datos del usuario
-$usuario_id = $_SESSION['usuario_id'];
-$sql = "SELECT nombre, apellido, username, email FROM usuario WHERE id = ?";
-$stmt = $conn->prepare($sql);
+$stmt = $conn->prepare("SELECT email, ... FROM usuario WHERE id = ?");
 $stmt->bind_param("i", $usuario_id);
 $stmt->execute();
 $resultado = $stmt->get_result();
-
-if ($resultado->num_rows > 0) {
-    $usuario = $resultado->fetch_assoc();
-} else {
-    echo "Usuario no encontrado.";
-    exit();
-}
-
+$datos_extra_usuario = $resultado->fetch_assoc();
+$stmt->close();
 $conn->close();
+*/
 
-require_once 'header.php';
 ?>
 
 <style>
-.perfil-container {
+/* Estilos para tu página de perfil (puedes moverlos a un CSS externo si prefieres) */
+.profile-page-container {
     max-width: 800px;
-    margin: 80px auto;
+    margin: 50px auto;
     background: white;
-    padding: 40px;
+    padding: 30px;
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     font-family: 'Poppins', sans-serif;
 }
 
-.perfil-container h2 {
-    text-align: center;
-    margin-bottom: 30px;
-    color: var(--primary-color);
-}
-
-.perfil-dato {
+.profile-page-container img.profile-large {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid var(--primary-color, #007bff);
     margin-bottom: 20px;
 }
 
-.perfil-dato label {
-    display: block;
-    font-weight: 600;
-    color: #555;
-    margin-bottom: 5px;
+.profile-page-container h1 {
+    color: var(--primary-color);
+    margin-bottom: 10px;
 }
 
-.perfil-dato span {
-    display: block;
-    color: #333;
+.profile-page-container p {
     font-size: 1.1rem;
+    color: #555;
+    margin-bottom: 8px;
 }
 
-.btn-logout {
-    display: inline-block;
-    margin-top: 30px;
-    padding: 10px 20px;
+.profile-actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 15px;
+}
+
+.profile-actions a {
     background-color: var(--secondary-color);
     color: white;
-    border-radius: 30px;
-    text-align: center;
+    padding: 10px 20px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-size: 0.95rem;
     transition: background-color 0.3s ease;
 }
 
-.btn-logout:hover {
+.profile-actions a:hover {
     background-color: #009ac1;
 }
 </style>
-
-<div class="perfil-container">
-    <h2>Perfil del Usuario</h2>
-
-    <div class="perfil-dato">
-        <label>Nombre:</label>
-        <span><?= htmlspecialchars($usuario['nombre']) ?></span>
+<link rel="stylesheet" type="text/css" href="indstyle.css">
+<div class="profile-page-container">
+    <img src="<?php echo htmlspecialchars($foto_perfil); ?>" alt="Foto de Perfil" class="profile-large">
+    <h1>Bienvenido, <?php echo htmlspecialchars($nombre_completo); ?></h1>
+    <p><strong>Nombre de Usuario:</strong> <?php echo htmlspecialchars($username); ?></p>
+    <?php if (isset($_SESSION['email'])): // Si también guardas el email en la sesión ?>
+        <p><strong>Email:</strong> <?php echo htmlspecialchars($_SESSION['email']); ?></p>
+    <?php endif; ?>
+    <div class="profile-actions">
+        <a href="editar_perfil.php">Editar Perfil</a>
+        <a href="mis_reservas.php">Mis Reservas</a>
+        <a href="logout.php">Cerrar Sesión</a>
     </div>
-
-    <div class="perfil-dato">
-        <label>Apellido:</label>
-        <span><?= htmlspecialchars($usuario['apellido']) ?></span>
-    </div>
-
-    <div class="perfil-dato">
-        <label>Nombre de usuario:</label>
-        <span><?= htmlspecialchars($usuario['username']) ?></span>
-    </div>
-
-    <div class="perfil-dato">
-        <label>Email:</label>
-        <span><?= htmlspecialchars($usuario['email']) ?></span>
-    </div>
-
-    <a href="logout.php" class="btn-logout">Cerrar sesión</a>
 </div>
 
-<?php require_once 'footer.php'; ?>
+<?php require_once 'footer.php'; // Incluye el footer ?>
