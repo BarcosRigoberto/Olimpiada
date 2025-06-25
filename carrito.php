@@ -1,8 +1,13 @@
+<link rel="stylesheet" type="text/css" href="indstyle.css">
 <?php
 session_start();
-include 'conexion.php';
+require_once 'header.php';
 
-echo "<h2>Tu carrito</h2>";
+include 'conexion.php';
+?>
+<div class="carrito">
+<h2>Tu carrito</h2>
+<?php
 $total = 0;
 
 if (!empty($_SESSION['carrito'])) {
@@ -20,3 +25,18 @@ if (!empty($_SESSION['carrito'])) {
     echo "Tu carrito está vacío.";
 }
 ?>
+</div>
+
+<style>
+    .carrito {
+    margin-top:5px;
+    text-align: center;
+     max-width: 450px;
+    margin: 100px auto;
+    background: white;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    font-family: 'Poppins', sans-serif;
+}
+</style>
