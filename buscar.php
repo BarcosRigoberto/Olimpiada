@@ -90,6 +90,12 @@ if ($busqueda !== '') {
                     <p><?php echo htmlspecialchars($paquete['descripcion']); ?></p>
                     <p><strong>Destino:</strong> <?php echo htmlspecialchars($paquete['destino']); ?></p>
                     <p><strong>Precio:</strong> $<?php echo number_format($paquete['precio'], 0, ',', '.'); ?> USD</p>
+                    <button class="btn btn-secondary add-to-cart-btn" 
+                                data-id="<?php echo $paquete['id']; ?>" 
+                                data-name="<?php echo htmlspecialchars($paquete['nombre']); ?>" 
+                                data-price="<?php echo $paquete['precio']; ?>">
+                            Añadir al Carrito
+                        </button>
                 </article>
             <?php endforeach; ?>
         </div>
