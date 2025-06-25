@@ -46,8 +46,7 @@ $stmt_check->close(); // Cierra el statement después de usarlo
 
 // --- Manejo de la subida de la foto de perfil ---
 // Ruta de la imagen de perfil por defecto
-// Asegúrate de que 'assets/img/default_avatar.png' exista.
-$foto_perfil_path = 'assets/img/default_avatar.png'; 
+$foto_perfil_path = 'uploads\profiles\default.jpg'; 
 
 // Verificar si se ha subido un archivo sin errores
 if (isset($_FILES['foto_perfil']) && $_FILES['foto_perfil']['error'] === UPLOAD_ERR_OK) {

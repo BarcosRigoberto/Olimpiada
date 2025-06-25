@@ -14,7 +14,7 @@ require_once 'header.php'; // Incluye el header para la navegación
 $usuario_id = $_SESSION['id'];
 $username = $_SESSION['username'];
 $nombre_completo = $_SESSION['nombre']; // Asumiendo que 'nombre' es el nombre completo o solo el nombre
-$foto_perfil = $_SESSION['foto_perfil'] ?? 'assets/img/default_avatar.png'; // Usar la de la sesión o la por defecto
+$foto_perfil = $_SESSION['foto_perfil'] ?? 'uploads\profiles\default.jpg'; // Usar la de la sesión o la por defecto
 
 // Opcional: Si necesitas más datos del usuario que no están en la sesión,
 // puedes hacer una consulta a la base de datos aquí usando $usuario_id.

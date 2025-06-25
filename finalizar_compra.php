@@ -1,5 +1,10 @@
 <?php
 session_start();
+if (!isset($_SESSION['usuario_id'])) {
+    // Si no hay sesión iniciada, no se puede comprar. Redirigir a login.
+    header("Location: login.php?error=debes_iniciar_sesion");
+    exit();
+}
 include 'conexion.php';
 $total = 0;
 $items = [];
@@ -12,7 +17,8 @@ foreach ($_SESSION['carrito'] as $id => $cantidad) {
     $items[] = ["id" => $id, "cantidad" => $cantidad, "precio" => $precio];
 }
 
-$conn->query("INSERT INTO compras (session_id, total) VALUES ('" . session_id() . "', $total)");
+$id_usuario_actual = $_SESSION['usuario_id'];
+$conn->query("INSERT INTO compras (usuario_id, total) VALUES ($id_usuario_actual, $total)");
 $id_compra = $conn->insert_id;
 
 foreach ($items as $i) {

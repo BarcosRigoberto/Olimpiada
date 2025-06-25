@@ -7,7 +7,7 @@ if (session_status() == PHP_SESSION_NONE) {
 }
 
 // Ruta a la imagen de perfil por defecto
-$default_profile_image = 'assets/img/default_avatar.png'; 
+$default_profile_image = 'uploads\profiles\default.jpg'; 
 
 // Determina la URL de la imagen de perfil a mostrar
 $profile_image_url = $default_profile_image;
