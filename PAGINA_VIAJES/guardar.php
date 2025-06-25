@@ -26,14 +26,14 @@ $resultado = $stmt->get_result();
 if ($resultado->num_rows === 1) {
     $usuario = $resultado->fetch_assoc();
 
-    // Verificar contraseña (plaintext, pero idealmente con hash)
-    if ($password === $usuario['contraseña']) {
+    // ✅ Verificar con password_verify
+    if (password_verify($password, $usuario['contraseña'])) {
         $_SESSION['usuario_id'] = $usuario['id'];
         header("Location: index.php");
         exit();
     }
 }
 
-// Fallo de login
+// ❌ Fallo de login
 header("Location: login.php?error=1");
 exit();
