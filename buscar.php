@@ -85,6 +85,7 @@ if ($busqueda !== '') {
         <div class="search-packages-grid">
             <?php foreach ($resultados as $paquete): ?>
                 <article class="search-package-card">
+                    <img src="<?php echo htmlspecialchars($paquete['imagen']); ?>" alt="<?php echo htmlspecialchars($paquete['nombre']); ?>" class="package-image">
                     <h3><?php echo htmlspecialchars($paquete['nombre']); ?></h3>
                     <p><?php echo htmlspecialchars($paquete['descripcion']); ?></p>
                     <p><strong>Destino:</strong> <?php echo htmlspecialchars($paquete['destino']); ?></p>
