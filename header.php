@@ -7,7 +7,7 @@ if (session_status() == PHP_SESSION_NONE) {
 }
 
 // Ruta a la imagen de perfil por defecto
-$default_profile_image = 'uploads/profiles/default.jpg'; 
+$default_profile_image = 'uploads\profiles\default.jpg'; 
 
 // Determina la URL de la imagen de perfil a mostrar
 $profile_image_url = $default_profile_image;
@@ -32,7 +32,7 @@ $activePage = $activePage ?? '';
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     
-    <link rel="stylesheet" href="assets/css/style.css">
+    
 
     <style>
         /* Estilos para el contenedor del icono de perfil y el menú desplegable */
@@ -122,7 +122,7 @@ $activePage = $activePage ?? '';
             <a href="index.php" class="navbar-brand">AVENTURA GLOBAL</a>
             <ul class="navbar-nav">
                 <li><a href="index.php" class="nav-link <?php echo ($activePage === 'inicio') ? 'active' : ''; ?>">Inicio</a></li>
-                <li><a href="#Pop" class="nav-link <?php echo ($activePage === 'destinos') ? 'active' : ''; ?>">Destinos</a></li>
+                <li><a href="index.php#Pop" class="nav-link <?php echo ($activePage === 'destinos') ? 'active' : ''; ?>">Destinos</a></li>
                 <li><a href="#footer" class="nav-link <?php echo ($activePage === 'contacto') ? 'active' : ''; ?>">Contacto</a></li>
             </ul>
             <div class="navbar-right">

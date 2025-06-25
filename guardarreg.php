@@ -1,16 +1,7 @@
 <?php
 session_start();
 
-// Conexión a la BD
-$host = 'localhost';
-$usuario_db = 'root'; // Cambiado a $usuario_db para evitar conflicto con $usuario del POST
-$contrasena_db = ''; // Cambiado a $contrasena_db
-$basedatos = 'pagviajes';
-
-$conn = new mysqli($host, $usuario_db, $contrasena_db, $basedatos);
-if ($conn->connect_error) {
-    die("Error de conexión a la base de datos: " . $conn->connect_error);
-}
+require_once 'conexion.php';
 
 // Asegúrate de que los datos vengan por POST
 if ($_SERVER["REQUEST_METHOD"] != "POST") {
@@ -33,7 +24,7 @@ if (empty($nombre) || empty($apellido) || empty($username) || empty($email) || e
 
 // Verificar si el usuario o email ya existen
 $sql_check = "SELECT id FROM usuario WHERE username = ? OR email = ?";
-$stmt_check = $conn->prepare($sql_check);
+$stmt_check = $mysqli->prepare($sql_check);
 $stmt_check->bind_param("ss", $username, $email);
 $stmt_check->execute();
 $resultado_check = $stmt_check->get_result();
@@ -46,7 +37,7 @@ $stmt_check->close(); // Cierra el statement después de usarlo
 
 // --- Manejo de la subida de la foto de perfil ---
 // Ruta de la imagen de perfil por defecto
-$foto_perfil_path = 'uploads/profiles/default.jpg'; 
+$foto_perfil_path = 'uploads\profiles\default.jpg'; 
 
 // Verificar si se ha subido un archivo sin errores
 if (isset($_FILES['foto_perfil']) && $_FILES['foto_perfil']['error'] === UPLOAD_ERR_OK) {
@@ -98,12 +89,12 @@ $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 // Insertar usuario en la base de datos, incluyendo la foto de perfil
 // Asegúrate de que tu tabla 'usuario' tenga una columna 'foto_perfil' (VARCHAR)
 $sql_insert = "INSERT INTO usuario (nombre, apellido, username, email, contraseña, foto_perfil) VALUES (?, ?, ?, ?, ?, ?)";
-$stmt_insert = $conn->prepare($sql_insert);
+$stmt_insert = $mysqli->prepare($sql_insert);
 $stmt_insert->bind_param("ssssss", $nombre, $apellido, $username, $email, $hashed_password, $foto_perfil_path);
 
 if ($stmt_insert->execute()) {
     // Registro exitoso, iniciar sesión automáticamente (opcional)
-    $_SESSION['id'] = $conn->insert_id; // Obtiene el ID del usuario recién insertado
+    $_SESSION['id'] = $mysqli->insert_id; // Obtiene el ID del usuario recién insertado
     $_SESSION['username'] = $username;
     $_SESSION['nombre'] = $nombre;
     $_SESSION['foto_perfil'] = $foto_perfil_path; // Guardar la ruta de la foto en la sesión
@@ -117,6 +108,6 @@ if ($stmt_insert->execute()) {
 }
 
 $stmt_insert->close();
-$conn->close();
+$mysqli->close();
 
 ?>
