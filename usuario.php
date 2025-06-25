@@ -12,7 +12,7 @@ require_once 'header.php';
 $usuario_id = $_SESSION['id'];
 $username = $_SESSION['username'];
 $nombre_completo = $_SESSION['nombre']; 
-$foto_perfil = $_SESSION['foto_perfil'] ?? 'uploads\profiles\default.jpg'; 
+$foto_perfil = $_SESSION['foto_perfil'] ?? 'uploads/profiles/default.jpg'; 
 
 ?>
 
