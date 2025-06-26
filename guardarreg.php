@@ -37,7 +37,7 @@ $stmt_check->close(); // Cierra el statement después de usarlo
 
 // --- Manejo de la subida de la foto de perfil ---
 // Ruta de la imagen de perfil por defecto
-$foto_perfil_path = 'uploads/profiles/default.jpg'; 
+$foto_perfil_path = 'uploads/profiles/default.png'; 
 
 // Verificar si se ha subido un archivo sin errores
 if (isset($_FILES['foto_perfil']) && $_FILES['foto_perfil']['error'] === UPLOAD_ERR_OK) {
@@ -93,11 +93,14 @@ $stmt_insert = $mysqli->prepare($sql_insert);
 $stmt_insert->bind_param("ssssss", $nombre, $apellido, $username, $email, $hashed_password, $foto_perfil_path);
 
 if ($stmt_insert->execute()) {
-    // Registro exitoso, iniciar sesión automáticamente (opcional)
+    // Registro exitoso, iniciar sesión automáticamente
     $_SESSION['id'] = $mysqli->insert_id; // Obtiene el ID del usuario recién insertado
     $_SESSION['username'] = $username;
     $_SESSION['nombre'] = $nombre;
     $_SESSION['foto_perfil'] = $foto_perfil_path; // Guardar la ruta de la foto en la sesión
+    
+    // *** AÑADE ESTA LÍNEA CLAVE: Marcar al usuario como logueado ***
+    $_SESSION['logged_in'] = true; 
 
     header("Location: index.php?success=" . urlencode("¡Registro exitoso! Ya has iniciado sesión."));
     exit();

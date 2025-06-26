@@ -1,22 +1,45 @@
 <?php
 // header.php
 
-// Esto debe ser lo primero, sin espacios ni HTML antes.
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-// Ruta a la imagen de perfil por defecto
-$default_profile_image = 'uploads/profiles/default.jpg'; 
+require_once 'conexion.php'; 
 
-// Determina la URL de la imagen de perfil a mostrar
+$default_profile_image = 'uploads/profiles/default.jpg'; 
 $profile_image_url = $default_profile_image;
 if (isset($_SESSION['foto_perfil']) && !empty($_SESSION['foto_perfil'])) {
     $profile_image_url = htmlspecialchars($_SESSION['foto_perfil']);
 }
 
-// Para resaltar la página activa en el nav
 $activePage = $activePage ?? '';
+
+// --- NUEVA LÓGICA PARA EL CONTADOR DEL CARRITO ---
+$cartItemsCount = 0; // Valor por defecto
+
+// Solo intenta obtener el contador si el usuario es un comprador o no está logueado
+// y si existe una session_id_carrito
+if ( (!isset($_SESSION['logged_in']) || (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && isset($_SESSION['rol']) && $_SESSION['rol'] === 'comprador')) && isset($_SESSION['session_id_carrito'])) {
+    $sessionIdCarrito = $_SESSION['session_id_carrito'];
+    
+    // Consulta para contar el total de ítems distintos o la suma de cantidades
+    // Si quieres contar el NÚMERO DE PAQUETES DISTINTOS en el carrito:
+    $stmt = $mysqli->prepare("SELECT COUNT(id) AS total_items FROM carrito WHERE session_id = ?");
+    
+    // Si quieres sumar la CANTIDAD TOTAL de productos (ej. 2 remeras + 3 pantalones = 5 items):
+    // $stmt = $mysqli->prepare("SELECT SUM(cantidad) AS total_items FROM carrito WHERE session_id = ?");
+
+    if ($stmt) {
+        $stmt->bind_param("s", $sessionIdCarrito);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        $cartItemsCount = $row['total_items'] ?? 0;
+        $stmt->close();
+    }
+}
+// --- FIN NUEVA LÓGICA ---
 
 ?>
 <!DOCTYPE html>
@@ -32,17 +55,30 @@ $activePage = $activePage ?? '';
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="indstyle.css">
+
+    <script>
+        // Esta variable se define globalmente, DISPONIBLE para script.js
+        // Ahora $cartItemsCount siempre tendrá el valor correcto de la BD
+        const initialCartItemCount = <?php echo $cartItemsCount; ?>;
+    </script>
 
     <style>
-        /* Estilos para el contenedor del icono de perfil y el menú desplegable */
+        /* ... Tus estilos existentes ... */
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        .cart-count.animate {
+            animation: pop 0.3s ease-out;
+        }
+        /* Tus estilos para el perfil y dropdown */
         .profile-dropdown {
             position: relative;
             display: inline-block;
             vertical-align: middle;
-            /* Elimina los estilos de hover del CSS para que JavaScript los controle */
         }
-
         .profile-dropdown-toggle {
             display: block;
             padding: 0;
@@ -50,10 +86,8 @@ $activePage = $activePage ?? '';
             border: none;
             background: none;
             line-height: 1;
-            /* Asegúrate de que el focus state sea visible para accesibilidad */
             outline: none; 
         }
-
         .profile-icon {
             width: 40px;
             height: 40px;
@@ -63,14 +97,12 @@ $activePage = $activePage ?? '';
             vertical-align: middle;
             transition: border-color 0.3s ease;
         }
-
         .profile-icon:hover,
-        .profile-dropdown-toggle:focus .profile-icon { /* Añadido focus state */
+        .profile-dropdown-toggle:focus .profile-icon {
             border-color: var(--secondary-color, #0056b3);
         }
-
         .dropdown-content {
-            display: none; /* Por defecto oculto, JS lo mostrará */
+            display: none;
             position: absolute;
             background-color: #f9f9f9;
             min-width: 160px;
@@ -82,12 +114,9 @@ $activePage = $activePage ?? '';
             padding: 5px 0;
             margin-top: 10px;
         }
-
-        /* Clase que JS añadirá para mostrar el menú */
         .dropdown-content.show {
             display: block;
         }
-
         .dropdown-content a {
             color: #333;
             padding: 10px 15px;
@@ -97,21 +126,25 @@ $activePage = $activePage ?? '';
             white-space: nowrap;
             transition: background-color 0.2s ease;
         }
-
         .dropdown-content a:hover {
             background-color: #e9e9e9;
         }
-
-        /* Ajuste para los enlaces de login/registro cuando no hay sesión */
         .navbar-right .nav-link {
             padding: 8px 15px;
         }
-
-        /* Asegurar que los elementos del navbar-right estén alineados */
         .navbar-right {
             display: flex;
             align-items: center;
             gap: 15px;
+        }
+        /* Estilos para el contador del carrito */
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        .cart-count.animate {
+            animation: pop 0.3s ease-out;
         }
     </style>
 </head>
@@ -133,6 +166,17 @@ $activePage = $activePage ?? '';
                         </button>
                         <div class="dropdown-content" id="profileDropdownContent">
                             <a href="usuario.php">Mi Perfil</a>
+                            
+                            <?php if (isset($_SESSION['rol'])): ?>
+                                <?php if ($_SESSION['rol'] === 'comprador'): ?>
+                                    <a href="mis_reservas.php">Mis Reservas</a>
+                                <?php elseif ($_SESSION['rol'] === 'vendedor'): ?>
+                                    <a href="panel_vendedor.php">Mi Panel de Vendedor</a>
+                                <?php elseif ($_SESSION['rol'] === 'admin'): ?>
+                                    <a href="panel_admin.php">Panel de Administración</a>
+                                <?php endif; ?>
+                            <?php endif; ?>
+
                             <a href="logout.php">Cerrar Sesión</a>
                         </div>
                     </div>
@@ -140,35 +184,42 @@ $activePage = $activePage ?? '';
                     <a href="login.php" class="nav-link <?php echo ($activePage === 'login') ? 'active' : ''; ?>">Iniciar Sesión</a>
                     <a href="registro.php" class="nav-link <?php echo ($activePage === 'registro') ? 'active' : ''; ?>">Registrarse</a>
                 <?php endif; ?>
-                <a href="carrito.php" class="nav-link cart-icon">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span id="cart-count" class="cart-count">0</span>
-                </a>
+
+                <?php 
+                // Mostrar el carrito solo si el usuario no está logueado O si es un comprador
+                if (!isset($_SESSION['logged_in']) || (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && isset($_SESSION['rol']) && $_SESSION['rol'] === 'comprador')): 
+                ?>
+                    <a href="carrito.php" class="nav-link cart-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span id="cart-count" class="cart-count"><?php echo $cartItemsCount; ?></span>
+                    </a>
+                <?php endif; ?>
             </div>
         </nav>
     </header>
 
     <main>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const profileToggle = document.getElementById('profileDropdownToggle');
             const profileContent = document.getElementById('profileDropdownContent');
+            const cartCountElement = document.getElementById('cart-count'); 
+            
+            if (cartCountElement) {
+                cartCountElement.textContent = initialCartItemCount;
+            }
 
             if (profileToggle && profileContent) {
-                // Función para mostrar/ocultar el menú
                 function toggleDropdown() {
                     profileContent.classList.toggle('show');
                     profileToggle.setAttribute('aria-expanded', profileContent.classList.contains('show'));
                 }
 
-                // Evento click en el icono/botón de perfil
                 profileToggle.addEventListener('click', function(event) {
-                    event.stopPropagation(); // Evita que el clic se propague al document
+                    event.stopPropagation();
                     toggleDropdown();
                 });
 
-                // Cierra el menú si se hace clic fuera de él
                 document.addEventListener('click', function(event) {
                     if (!profileToggle.contains(event.target) && !profileContent.contains(event.target)) {
                         if (profileContent.classList.contains('show')) {
@@ -178,14 +229,24 @@ $activePage = $activePage ?? '';
                     }
                 });
 
-                // Opcional: Cerrar el menú si se presiona ESC
                 document.addEventListener('keydown', function(event) {
                     if (event.key === 'Escape' && profileContent.classList.contains('show')) {
                         profileContent.classList.remove('show');
                         profileToggle.setAttribute('aria-expanded', 'false');
-                        profileToggle.focus(); // Devuelve el foco al botón de alternar
+                        profileToggle.focus();
                     }
                 });
             }
         });
+
+        function updateCartCount(newCount) {
+            const cartCountElement = document.getElementById('cart-count');
+            if (cartCountElement) {
+                cartCountElement.textContent = newCount;
+                cartCountElement.classList.add('animate');
+                setTimeout(() => {
+                    cartCountElement.classList.remove('animate');
+                }, 300); 
+            }
+        }
     </script>

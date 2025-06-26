@@ -1,72 +1,137 @@
 document.addEventListener('DOMContentLoaded', function() {
 
+    // --- CÓDIGO DEL PERFIL DROPDOWN (MOVÍDO AQUÍ DESDE HEADER.PHP) ---
+    const profileToggle = document.getElementById('profileDropdownToggle');
+    const profileContent = document.getElementById('profileDropdownContent');
+
+    if (profileToggle && profileContent) {
+        function toggleDropdown() {
+            profileContent.classList.toggle('show');
+            profileToggle.setAttribute('aria-expanded', profileContent.classList.contains('show'));
+        }
+
+        profileToggle.addEventListener('click', function(event) {
+            event.stopPropagation();
+            toggleDropdown();
+        });
+
+        document.addEventListener('click', function(event) {
+            if (!profileToggle.contains(event.target) && !profileContent.contains(event.target)) {
+                if (profileContent.classList.contains('show')) {
+                    profileContent.classList.remove('show');
+                    profileToggle.setAttribute('aria-expanded', 'false');
+                }
+            }
+        });
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && profileContent.classList.contains('show')) {
+                profileContent.classList.remove('show');
+                profileToggle.setAttribute('aria-expanded', 'false');
+                profileToggle.focus();
+            }
+        });
+    }
+
     // --- LÓGICA DEL CARRITO DE COMPRAS ---
 
     const cartCountElement = document.getElementById('cart-count');
     const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
 
-    // Inicializamos el contador del carrito.
-    // En un proyecto real, este valor vendría de la sesión del usuario o de la base de datos.
-    let cartItemCount = 0;
-
-    addToCartButtons.forEach(button => {
-        button.addEventListener('click', function(event) {
-            event.preventDefault(); // Evita que la página se recargue
-
-            // Obtenemos los datos del producto desde los atributos 'data-*' del botón
-            const packageId = this.dataset.id;
-            const packageName = this.dataset.name;
-            const packagePrice = this.dataset.price;
-
-            console.log(`Añadido al carrito: ${packageName} (ID: ${packageId}, Precio: $${packagePrice})`);
-            
-            // Incrementamos el contador visual del carrito
-            cartItemCount++;
-            updateCartCount();
-
-            // Damos feedback visual al usuario
-            showAddedFeedback(this);
-
-            // Aquí, en un futuro, llamaríamos a una función para añadir el item al
-            // localStorage o enviar una petición al servidor (backend) para guardarlo en la base de datos.
-            // Ejemplo: addItemToCartSession(packageId, packageName, packagePrice);
-        });
-    });
-
+    let cartItemCount = parseInt(cartCountElement.textContent) || 0;
+    
     function updateCartCount() {
-        cartCountElement.textContent = cartItemCount;
-        // Agregamos una pequeña animación para llamar la atención
-        cartCountElement.classList.add('animate');
-        setTimeout(() => {
-            cartCountElement.classList.remove('animate');
-        }, 300); // La duración de la animación en CSS
+        if (cartCountElement) {
+            cartCountElement.textContent = cartItemCount;
+            cartCountElement.classList.add('animate');
+            setTimeout(() => {
+                cartCountElement.classList.remove('animate');
+            }, 300);
+        }
     }
 
     function showAddedFeedback(button) {
         const originalText = button.innerHTML;
+        const originalBgColor = button.style.backgroundColor;
+        const originalColor = button.style.color;
+
         button.innerHTML = '¡Añadido! <i class="fas fa-check"></i>';
-        button.disabled = true;
-        button.style.backgroundColor = '#28a745'; // Color verde de éxito
+        button.disabled = true; 
+        button.style.backgroundColor = '#28a745';
+        button.style.color = 'white';
 
         setTimeout(() => {
             button.innerHTML = originalText;
-            button.disabled = false;
-            button.style.backgroundColor = ''; // Vuelve al color original del CSS
-        }, 2000); // El mensaje dura 2 segundos
+            // Solo vuelve a habilitar el botón si el usuario está logueado
+            if (isUserLoggedIn) {
+                button.disabled = false; 
+            }
+            button.style.backgroundColor = originalBgColor;
+            button.style.color = originalColor;
+        }, 2000);
     }
 
-    // --- CSS ADICIONAL PARA LA ANIMACIÓN (se inyecta con JS) ---
-    const style = document.createElement('style');
-    style.innerHTML = `
-        @keyframes pop {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.3); }
-            100% { transform: scale(1); }
-        }
-        .cart-count.animate {
-            animation: pop 0.3s ease-out;
-        }
-    `;
-    document.head.appendChild(style);
+    // --- LÓGICA PRINCIPAL: MANEJO DEL CLIC EN EL BOTÓN AÑADIR AL CARRITO ---
+
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', function(event) {
+            event.preventDefault();
+
+            // Bloquea la acción si el usuario no está logueado
+            if (!isUserLoggedIn) {
+                alert('Debes iniciar sesión para añadir productos al carrito.');
+                // Opcional: Redirigir a la página de login si lo prefieres
+                // window.location.href = 'login.php'; 
+                return; // Detiene la ejecución del fetch
+            }
+
+            const packageId = this.dataset.id;
+            const packageName = this.dataset.name;
+            const packagePrice = this.dataset.price;
+
+            showAddedFeedback(this); // Muestra feedback visual inmediatamente
+
+            fetch('agregar_carrito.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `id_paquete=${packageId}&nombre_paquete=${encodeURIComponent(packageName)}&precio_paquete=${packagePrice}`
+            })
+            .then(response => {
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    return response.json();
+                } else {
+                    console.error('La respuesta del servidor no es JSON. Contenido:', response.text());
+                    return response.text().then(text => { throw new Error('Respuesta no JSON: ' + text); });
+                }
+            })
+            .then(data => {
+                if (data.success) {
+                    cartItemCount++;
+                    updateCartCount();
+                    console.log('¡Paquete añadido al carrito con éxito en el servidor!');
+                } else {
+                    // Si el servidor indica que no está logueado, también alertamos
+                    if (data.message === 'No autorizado: Debes iniciar sesión para añadir productos al carrito.') {
+                        alert('Debes iniciar sesión para añadir productos al carrito.');
+                        // Opcional: Redirigir
+                        // window.location.href = 'login.php'; 
+                    } else {
+                        alert('Error al añadir el paquete: ' + data.message);
+                    }
+                    console.error('Error del servidor:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error en la petición Fetch:', error);
+                alert('Hubo un error al conectar con el servidor o procesar la respuesta.');
+            });
+        });
+    });
+
+    // Esta llamada es importante para que el contador muestre el valor inicial al cargar la página
+    updateCartCount();
 
 });

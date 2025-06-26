@@ -69,4 +69,4 @@ function confirmarGuardado() {
         <button type="submit" onclick="return confirmarGuardado()">Guardar Cambios</button>
     </form>
 </div>
-<?php require_once 'footer.php'; ?>
+<?php require_once 'footer.php'; ?> 

@@ -1,6 +1,6 @@
 <?php
-include 'conexion.php';
-$resultado = $conn->query("SELECT * FROM paquetes");
+require_once 'conexion.php';
+$resultado = $mysqli->query("SELECT * FROM paquetes");
 ?>
 <h2>Paquetes disponibles</h2>
 <?php while($p = $resultado->fetch_assoc()): ?>

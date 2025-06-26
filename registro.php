@@ -2,18 +2,28 @@
 session_start();
 
 // Si ya hay una sesión iniciada, redirige al usuario logueado (puedes ajustar la redirección)
-if (isset($_SESSION['id'])) { // Usamos 'id' de la sesión que se establece en login_validar.php y guardarreg.php
+if (isset($_SESSION['id'])) { 
     header("Location: index.php"); // O a perfil.php
     exit();
 }
 
 $pageTitle = "Registrarse - Aventura Global";
-require_once 'header.php'; // Asegúrate de que header.php tenga session_start()
+require_once 'header.php'; 
 
 ?>
 <link rel="stylesheet" type="text/css" href="indstyle.css">
 <style>
 
+.btn-vendedor {
+    background-color: var(--secondary-color);
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 30px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
 .registro-container {
     max-width: 450px;
     margin: 100px auto;
@@ -77,10 +87,21 @@ require_once 'header.php'; // Asegúrate de que header.php tenga session_start()
     font-size: 1rem;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    width: 100%; /* Ajuste para que el botón ocupe todo el ancho */
 }
 
 .registro-container button:hover {
     background-color: #009ac1;
+}
+
+/* Nuevo estilo para el botón de registro de vendedor */
+.registro-container .btn-vendedor {
+    background-color: #28a745; /* Un verde distintivo */
+    margin-top: 15px; /* Espacio entre los botones */
+}
+
+.registro-container .btn-vendedor:hover {
+    background-color: #218838;
 }
 
 .error-msg, .success-msg {
@@ -119,12 +140,20 @@ require_once 'header.php'; // Asegúrate de que header.php tenga session_start()
         <input type="file" name="foto_perfil" id="foto_perfil" accept="image/jpeg, image/png, image/gif">
         <small>Formatos: JPG, PNG, GIF. Max 2MB.</small>
 
-        <button type="submit">Registrarse</button>
+        <button type="submit">Registrarse como Comprador</button>
     </form>
 
-    <p style="text-align: center; margin-top: 15px;">
+    <p style="text-align: center; margin-top: 15px; color: blue;">
         ¿Ya tienes una cuenta? <a href="login.php">Iniciar Sesión aquí</a>
     </p>
+
+
+    <div style="text-align: center; margin-top: 20px; ">
+        <p>¿Quieres vender tus propios paquetes?</p>
+        <br>
+        <a href="registro_vendedor.php" class="btn-vendedor">Registrar Cuenta de Vendedor</a>
+    </div>
+
 </div>
 
 <?php require_once 'footer.php'; ?>
